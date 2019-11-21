@@ -12,7 +12,7 @@ library(scales)
 ```
 
 ```{r data_import}
-# populacao <- get_sidra(6579, geo = "City", format = 3) %>% as_tibble()
+# populacao <- get_sidra(6579, period = c("2001", "2009", "2019"), geo = "City", format = 3) %>% as_tibble()
 # pin(populacao)
 
 map_data <-
@@ -22,8 +22,9 @@ map_data <-
   st_as_sf()
 
 ggplot(map_data) +
+  facet_wrap(~Ano) +
   geom_sf(aes(fill = Valor), color = NA) +
   coord_sf(datum = NA) +
-  scale_fill_distiller(palette = "Spectral", trans = "log10", labels = scales::label_number_si())
+  scale_fill_distiller(name = "População", palette = "Spectral", trans = "log10", labels = scales::label_number_si())
 ```
 
