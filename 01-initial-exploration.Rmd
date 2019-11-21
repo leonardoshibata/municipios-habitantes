@@ -4,14 +4,15 @@ output: html_notebook
 ---
 
 ```{r setup}
-library(tidyverse)
-library(sidrar)
-library(pins)
-library(brmap)
-library(scales)
-library(gganimate)
-library(transformr)
-# gifski
+if(!require(pacman)) install.packages("pacman")
+pacman::p_load(tidyverse)
+pacman::p_load(sidrar)
+pacman::p_load(pins)
+pacman::p_load(brmap)
+pacman::p_load(scales)
+pacman::p_load(gganimate)
+pacman::p_load(transformr)
+pacman::p_load(gifski)
 ```
 
 ```{r data_import}
