@@ -9,22 +9,28 @@ library(sidrar)
 library(pins)
 library(brmap)
 library(scales)
+library(gganimate)
+library(transformr)
 ```
 
 ```{r data_import}
-# populacao <- get_sidra(6579, period = c("2001", "2009", "2019"), geo = "City", format = 3) %>% as_tibble()
-# pin(populacao)
+populacao <- get_sidra(6579, period = c("2009", "2019"), geo = "City", format = 3) %>% as_tibble()
+pin(populacao)
 
 map_data <-
   pin_get("populacao") %>%
-  mutate(municipio_cod = as.numeric(`Município (Código)`)) %>%
+  mutate(
+    municipio_cod = as.numeric(`Município (Código)`),
+    ano = as.numeric(Ano)) %>%
   right_join(brmap::brmap_municipio_simples) %>%
   st_as_sf()
 
-ggplot(map_data) +
-  facet_wrap(~Ano) +
+p <- ggplot(map_data) +
   geom_sf(aes(fill = Valor), color = NA) +
   coord_sf(datum = NA) +
-  scale_fill_distiller(name = "População", palette = "Spectral", trans = "log10", labels = scales::label_number_si())
+  scale_fill_distiller(name = "População", palette = "Spectral", trans = "log10", labels = scales::label_number_si()) +
+  transition_time(ano)
+
+animate(p, width = 450, height = 450)
 ```
 
