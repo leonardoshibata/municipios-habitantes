@@ -8,9 +8,22 @@ library(tidyverse)
 library(sidrar)
 library(pins)
 library(brmap)
+library(scales)
 ```
 
 ```{r data_import}
-populacao <- get_sidra(6579, geo = "City", format = 3)
+# populacao <- get_sidra(6579, geo = "City", format = 3) %>% as_tibble()
+# pin(populacao)
+
+map_data <-
+  pin_get("populacao") %>%
+  mutate(municipio_cod = as.numeric(`Município (Código)`)) %>%
+  right_join(brmap::brmap_municipio_simples) %>%
+  st_as_sf()
+
+ggplot(map_data) +
+  geom_sf(aes(fill = Valor), color = NA) +
+  coord_sf(datum = NA) +
+  scale_fill_distiller(palette = "Spectral", trans = "log10", labels = scales::label_number_si())
 ```
 
