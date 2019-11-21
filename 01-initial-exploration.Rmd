@@ -11,11 +11,12 @@ library(brmap)
 library(scales)
 library(gganimate)
 library(transformr)
+# gifski
 ```
 
 ```{r data_import}
-populacao <- get_sidra(6579, period = c("2009", "2019"), geo = "City", format = 3) %>% as_tibble()
-pin(populacao)
+# populacao <- get_sidra(6579, period = "all", geo = "City", format = 3) %>% as_tibble()
+# pin(populacao)
 
 map_data <-
   pin_get("populacao") %>%
@@ -26,11 +27,13 @@ map_data <-
   st_as_sf()
 
 p <- ggplot(map_data) +
+  labs(title = "Ano: {current_frame}") +
   geom_sf(aes(fill = Valor), color = NA) +
   coord_sf(datum = NA) +
   scale_fill_distiller(name = "População", palette = "Spectral", trans = "log10", labels = scales::label_number_si()) +
-  transition_time(ano)
+  transition_manual(ano)
 
-animate(p, width = 450, height = 450)
+animate(p, renderer = gifski_renderer())
+anim_save("mapa.gif")
 ```
 
