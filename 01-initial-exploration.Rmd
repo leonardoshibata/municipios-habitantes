@@ -1,0 +1,16 @@
+---
+title: "Número de habitantes por município"
+output: html_notebook
+---
+
+```{r setup}
+library(tidyverse)
+library(sidrar)
+library(pins)
+library(brmap)
+```
+
+```{r data_import}
+populacao <- get_sidra(6579, geo = "City", format = 3)
+```
+
