@@ -38,3 +38,18 @@ animate(p, renderer = gifski_renderer())
 anim_save("mapa.gif")
 ```
 
+
+```{r quantile}
+map_data %>%
+  filter(ano == 2019) %>%
+  mutate(
+    bin = cut(Valor, breaks = quantile(Valor, na.rm = TRUE, probs = seq(0, 1, by = 0.15)))
+  ) %>%
+  ggplot() +
+  geom_sf(aes(fill = bin), color = NA) +
+  coord_sf(datum = NA) +
+  # scale_fill_distiller(palette = "Spectral", trans = "log10", labels = scales::label_number_si())
+  # scale_fill_brewer(palette = "OrRd")
+  scale_fill_viridis_d(direction = -1)
+```
+
