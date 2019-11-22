@@ -23,15 +23,21 @@ map_data <-
   pin_get("populacao") %>%
   mutate(
     municipio_cod = as.numeric(`Município (Código)`),
-    ano = as.numeric(Ano)) %>%
-  right_join(brmap::brmap_municipio_simples) %>%
-  st_as_sf()
+    ano = as.numeric(Ano)
+    ) %>%
+  right_join(brmap::brmap_municipio_simples, by = "municipio_cod") %>%
+  filter(!is.na(Valor))
 
+map_data <- st_as_sf(map_data)
+```
+
+
+```{r mapa}
 p <- ggplot(map_data) +
   labs(title = "Ano: {current_frame}") +
   geom_sf(aes(fill = Valor), color = NA) +
   coord_sf(datum = NA) +
-  scale_fill_distiller(name = "População", palette = "Spectral", trans = "log10", labels = scales::label_number_si()) +
+  scale_fill_distiller(name = "População", palette = "YlOrRd", trans = "log10", labels = scales::label_number_si()) +
   transition_manual(ano)
 
 animate(p, renderer = gifski_renderer())
@@ -39,17 +45,23 @@ anim_save("mapa.gif")
 ```
 
 
-```{r quantile}
-map_data %>%
+```{r quantis}
+# quantis <- map_data %>%
+#   filter(ano == 2019) %>%
+#   mutate(bin = cut(Valor, breaks =
+#                      c(min(Valor)-1, quantile(Valor, probs = seq(0.2, 1, by = 0.2)), max(Valor)+1)))
+
+quantis <-
+  map_data %>%
   filter(ano == 2019) %>%
-  mutate(
-    bin = cut(Valor, breaks = quantile(Valor, na.rm = TRUE, probs = seq(0, 1, by = 0.15)))
-  ) %>%
-  ggplot() +
+  mutate(bin = cut(Valor,
+                   breaks = c(0, 4600, 8500, 15000, 30000, max(Valor)+1),
+                   labels = c("Até 4.600", "Até 8.500", "Até 15.000", "Até 30.000", "Até 13 mi")))
+
+ggplot(quantis) +
   geom_sf(aes(fill = bin), color = NA) +
   coord_sf(datum = NA) +
-  # scale_fill_distiller(palette = "Spectral", trans = "log10", labels = scales::label_number_si())
-  # scale_fill_brewer(palette = "OrRd")
-  scale_fill_viridis_d(direction = -1)
+  scale_fill_brewer(palette = "Spectral")
+  # scale_fill_viridis_d(direction = -1)
 ```
 
